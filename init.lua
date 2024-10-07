@@ -1049,7 +1049,6 @@ require('lazy').setup({
   --   'morhetz/gruvbox',
   --   name = 'gruvbox',
   -- },
-  { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
   { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true },
   {
     'decaycs/decay.nvim',
@@ -1071,6 +1070,14 @@ require('lazy').setup({
     end,
   },
   { 'folke/tokyonight.nvim', name = 'tokyonight-night' },
+  {
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    init = function()
+      vim.cmd.colorscheme 'catppuccin-mocha'
+    end,
+    priority = 10000,
+  },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
