@@ -1,4 +1,5 @@
 --[[
+--sp
 
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
@@ -83,6 +84,35 @@ I hope you enjoy your Neovim journey,
 
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
+--Local variable
+local kind_icons = {
+  Text = '',
+  Method = 'm',
+  Function = '',
+  Constructor = '',
+  Field = '',
+  Variable = '',
+  Class = '',
+  Interface = '',
+  Module = '',
+  Property = '',
+  Unit = '',
+  Value = '',
+  Enum = '',
+  Keyword = '',
+  Snippet = '',
+  Color = '',
+  File = '',
+  Reference = '',
+  Folder = '',
+  EnumMember = '',
+  Constant = '',
+  Struct = '',
+  Event = '',
+  Operator = '',
+  TypeParameter = '',
+  Copilot = '',
+}
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
@@ -91,7 +121,8 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
+vim.g.tex_flavor = 'latex'
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -102,7 +133,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -193,6 +224,7 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
+vim.cmd 'highlight Normal guibg=NONE guifg=NONE ctermbg=NONE ctermfg=NONE'
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
 --  See `:help vim.highlight.on_yank()`
@@ -243,6 +275,50 @@ require('lazy').setup({
   --    require('gitsigns').setup({ ... })
   --
   -- See `:help gitsigns` to understand what the configuration keys do
+
+  -- {
+  --   'L3MON4D3/LuaSnip',
+  --   -- follow latest release.
+  --   version = 'v2.*', -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+  --   -- install jsregexp (optional!).
+  --   build = 'make install_jsregexp',
+  --   config = function()
+  --     local ls = require 'luasnip'
+  --     ls.config.set_config { enable_autosnippets = true, store_selection_keys = '<Tab>' }
+  --     vim.keymap.set({ 'i' }, '<C-<CR>>', function()
+  --       ls.expand()
+  --     end, { silent = true })
+  --     vim.keymap.set({ 'i', 's' }, '<C-N>', function()
+  --       ls.jump(1)
+  --     end, { silent = true })
+  --     vim.keymap.set({ 'i', 's' }, '<C-P>', function()
+  --       ls.jump(-1)
+  --     end, { silent = true })
+  --
+  --     vim.keymap.set({ 'i', 's' }, '<C-E>', function()
+  --       if ls.choice_active() then
+  --         ls.change_choice(1)
+  --       end
+  --     end, { silent = true })
+  --     require('luasnip.loaders.from_lua').load { paths = '~/.config/nvim/LuaSnip/' }
+  --   end,
+  -- },
+
+  {
+    'lervag/vimtex',
+    lazy = false,
+    init = function()
+      vim.g.vimtex_view_method = 'zathura'
+      -- vim.maplocalleader = ','
+    end,
+  },
+  -- {
+  --   'evesdropper/luasnip-latex-snippets.nvim',
+  -- },
+  {
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+  },
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -436,8 +512,94 @@ require('lazy').setup({
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
+  {
+    'NvChad/nvterm',
+    config = function()
+      require('nvterm').setup()
+      require('nvterm').setup()
 
+      local terminal = require 'nvterm.terminal'
+
+      local toggle_modes = { 'n', 't' }
+      local mappings = {
+        {
+          toggle_modes,
+          '<A-h>',
+          function()
+            terminal.toggle 'horizontal'
+          end,
+        },
+        {
+          toggle_modes,
+          '<A-v>',
+          function()
+            terminal.toggle 'vertical'
+          end,
+        },
+        {
+          toggle_modes,
+          '<A-i>',
+          function()
+            terminal.toggle 'float'
+          end,
+        },
+      }
+      local opts = { noremap = true, silent = true }
+      for _, mapping in ipairs(mappings) do
+        vim.keymap.set(mapping[1], mapping[2], mapping[3], opts)
+      end
+    end,
+  },
   -- LSP Plugins
+  {
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    config = function()
+      require('copilot').setup {
+        panel = {
+          enabled = false,
+          auto_refresh = false,
+          keymap = {
+            jump_prev = '[[',
+            jump_next = ']]',
+            accept = '<CR>',
+            refresh = 'gr',
+            open = '<M-CR>',
+          },
+          layout = {
+            position = 'bottom', -- | top | left | right
+            ratio = 0.4,
+          },
+        },
+        suggestion = {
+          enabled = false,
+          auto_trigger = true,
+          debounce = 75,
+          keymap = {
+            accept = false,
+            accept_word = false,
+            accept_line = false,
+            next = '<M-]>',
+            prev = '<M-[>',
+            dismiss = '<C-]>',
+          },
+        },
+        filetypes = {
+          help = false,
+          gitcommit = false,
+          gitrebase = false,
+          hgcommit = false,
+          svn = false,
+          cvs = false,
+          ['.'] = false,
+        },
+        copilot_node_command = 'node', -- Node.js version must be > 16.x
+        server_opts_overrides = {},
+        on_status_update = require('lualine').refresh,
+      }
+    end,
+  },
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
     -- used for completion, annotations and signatures of Neovim apis
@@ -607,7 +769,7 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -724,16 +886,20 @@ require('lazy').setup({
           end
           return 'make install_jsregexp'
         end)(),
+        config = function()
+          require('luasnip.loaders.from_lua').load { paths = '~/.config/nvim/LuaSnip/' }
+          require('luasnip').config.set_config { enable_autosnippets = true }
+        end,
         dependencies = {
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -743,12 +909,23 @@ require('lazy').setup({
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+      {
+        'zbirenbaum/copilot-cmp',
+        config = function()
+          require('copilot_cmp').setup {
+            suggestion = { enabled = false },
+            panel = { enabled = false },
+          }
+        end,
+      },
     },
     config = function()
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
-      luasnip.config.setup {}
+      luasnip.config.setup {
+        enable_autosnippets = true,
+      }
 
       cmp.setup {
         snippet = {
@@ -775,7 +952,7 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<C-CR>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
@@ -819,29 +996,75 @@ require('lazy').setup({
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'copilot' },
+        },
+        formatting = {
+          expandable_indicator = true,
+          fields = { 'kind', 'abbr', 'menu' },
+          format = function(entry, vim_item)
+            -- Kind icons
+            vim_item.kind = string.format('%s', kind_icons[vim_item.kind])
+            -- vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
+            vim_item.menu = ({
+              nvim_lsp = '[LSP]',
+              luasnip = '[Snippet]',
+              buffer = '[Buffer]',
+              path = '[Path]',
+              copilot = '[Copilot]',
+            })[entry.source.name]
+            return vim_item
+          end,
+        },
+        window = {
+          documentation = {
+            border = { '╭', '─', '╮', '│', '╯', '─', '╰', '│' },
+          },
+        },
+        experimental = {
+          ghost_text = false,
+          native_menu = false,
         },
       }
     end,
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    init = function()
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+  -- { -- You can easily change to a different colorscheme.
+  -- Change the name of the colorscheme plugin below, and then
+  -- change the command in the config to whatever the name of that colorscheme is.
+  --
+  -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+  -- 'folke/tokyonight.nvim',
+  -- priority = 1000, -- Make sure to load this before all the other start plugins.
+  -- init = function()
+  -- Load the colorscheme here.
+  -- Like many other themes, this one has different styles, and you could load
+  -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+  -- vim.cmd.colorscheme 'tokyonight-night'
 
-      -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
+  -- You can configure highlights by doing something like:
+  -- vim.cmd.hi 'Comment gui=none'
+  -- end,
+  -- },
+  {
+    'decaycs/decay.nvim',
+    name = 'decay',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      -- SNIP
     end,
   },
-
+  {
+    'rose-pine/neovim',
+    name = 'rose-pine',
+    opts = {
+      styles = { italic = false },
+    },
+    init = function()
+      vim.cmd.colorscheme 'rose-pine'
+    end,
+  },
+  { 'folke/tokyonight.nvim', name = 'tokyonight-night' },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -890,13 +1113,14 @@ require('lazy').setup({
     opts = {
       ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
-      auto_install = true,
+      -- auto_install = true,
       highlight = {
         enable = true,
+        disable = { 'latex' },
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
         --  If you are experiencing weird indenting issues, add the language to
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
+        additional_vim_regex_highlighting = { 'ruby', 'latex' },
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
@@ -920,8 +1144,8 @@ require('lazy').setup({
   -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
