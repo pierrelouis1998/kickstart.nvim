@@ -1045,6 +1045,12 @@ require('lazy').setup({
   -- vim.cmd.hi 'Comment gui=none'
   -- end,
   -- },
+  -- {
+  --   'morhetz/gruvbox',
+  --   name = 'gruvbox',
+  -- },
+  { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
+  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true },
   {
     'decaycs/decay.nvim',
     name = 'decay',
