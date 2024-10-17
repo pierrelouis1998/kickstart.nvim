@@ -86,13 +86,13 @@ P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 --Local variable
 local kind_icons = {
-  Text = '',
+  Text = '',
   Method = 'm',
-  Function = '',
+  Function = '𝑓',
   Constructor = '',
   Field = '',
   Variable = '',
-  Class = '',
+  Class = '',
   Interface = '',
   Module = '',
   Property = '',
@@ -102,15 +102,15 @@ local kind_icons = {
   Keyword = '',
   Snippet = '',
   Color = '',
-  File = '',
+  File = '',
   Reference = '',
-  Folder = '',
+  Folder = '',
   EnumMember = '',
-  Constant = '',
+  Constant = '',
   Struct = '',
   Event = '',
   Operator = '',
-  TypeParameter = '',
+  TypeParameter = '',
   Copilot = '',
 }
 
@@ -194,6 +194,7 @@ vim.opt.scrolloff = 10
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+vim.keymap.set('n', ';', ':')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
@@ -769,7 +770,27 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        pyright = {},
+        mypy = {},
+        pyright = {
+          settings = {
+            pyright = {
+              disableOrganizeImports = true,
+            },
+            python = {
+              analysis = {
+                typeCheckingMode = 'off',
+                analysis = {
+                  ignore = { '*' },
+                },
+              },
+            },
+          },
+        },
+        ruff_lsp = {
+          capabilities = {
+            hoverProvider = false,
+          },
+        },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -1049,12 +1070,11 @@ require('lazy').setup({
   --   'morhetz/gruvbox',
   --   name = 'gruvbox',
   -- },
-  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true },
+  { 'ellisonleao/gruvbox.nvim', config = true },
   {
     'decaycs/decay.nvim',
     name = 'decay',
     lazy = false,
-    priority = 1000,
     config = function()
       -- SNIP
     end,
@@ -1076,7 +1096,6 @@ require('lazy').setup({
     init = function()
       vim.cmd.colorscheme 'catppuccin-mocha'
     end,
-    priority = 10000,
   },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
