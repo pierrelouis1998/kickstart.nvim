@@ -770,22 +770,26 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        mypy = {},
-        pyright = {
-          settings = {
-            pyright = {
-              disableOrganizeImports = true,
-            },
-            python = {
-              analysis = {
-                typeCheckingMode = 'off',
-                analysis = {
-                  ignore = { '*' },
-                },
-              },
-            },
+        basedpyright = {
+          basedpyright = {
+            disableOrganizeImports = true,
           },
         },
+        -- pyright = {
+        --   settings = {
+        --     pyright = {
+        --       disableOrganizeImports = true,
+        --     },
+        --     python = {
+        --       analysis = {
+        --         typeCheckingMode = 'off',
+        --         analysis = {
+        --           ignore = { '*' },
+        --         },
+        --       },
+        --     },
+        --   },
+        -- },
         ruff_lsp = {
           capabilities = {
             hoverProvider = false,
